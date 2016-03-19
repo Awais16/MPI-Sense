@@ -11,7 +11,17 @@ MPISense.init = function() {
         }
     });
 
-	this.initAcclerometerChart();	
+	this.initAcclerometerChart();
+	this.initSocket();
+};
+
+MPISense.initSocket=function(){
+	var socket = io('http://localhost:9000');
+	socket.on('acclerometer',MPISense.onAccelerometerData);
+	socket.emit("acclerometer",{"hello":"world"});
+};
+MPISense.onAccelerometerData=function(data){
+	console.log("data"+data);
 };
 
 MPISense.initAcclerometerChart=function(){
