@@ -1,19 +1,23 @@
 
 var Server = require('socket.io');
 
-var MPISocket=function(){};
-
-MPISocket.prototype.init=function(server){
-	this.io=new Server(server);
-	this.io.on('connection', MPISocket.prototype.onConnection);
+var MPISocket={
+	socket:{},
+	init:function(server){
+		var io= new Server(server);
+		io.on('connection',this.onConnection)
+	},
+	onConnection:function(socket){
+		MPISocket.socket=socket;
+		MPISocket.sendStatus("Connected with server");
+	},
+	sendStatus:function(status){
+		this.socket.emit("status",{status:status});
+	},
+	sendAccelerometer:function(data){
+		this.socket.emit("accelerometer",{data:data});	
+	}
+	
 };
 
-MPISocket.prototype.onConnection=function(socket){
-	console.log("onConnection");
-
-	socket.on("acclerometer",function(data){
-		console.log("accleration recieved"+data);
-	});
-};
-
-module.exports=new MPISocket();
+module.exports=MPISocket;

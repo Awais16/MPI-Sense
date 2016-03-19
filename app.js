@@ -34,7 +34,7 @@ app.use(function(req, res, next) {
   next(err);
 });
 
-//cross origin request, if error in 
+//allow cross origin request, for ajax;
 /*
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");

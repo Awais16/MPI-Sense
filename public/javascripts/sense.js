@@ -17,26 +17,54 @@ MPISense.init = function() {
 
 MPISense.initSocket=function(){
 	var socket = io('http://localhost:9000');
-	socket.on('acclerometer',MPISense.onAccelerometerData);
-	socket.emit("acclerometer",{"hello":"world"});
+	socket.on("connect",function(){
+		//$("#connectionStatus").text("connection established with server: awaiting data...");
+	});
+
+	socket.on("status",function(data){
+		$("#connectionStatus").text(data.status);
+	});
+	socket.on('accelerometer',MPISense.onAccelerometerData);
+	socket.emit("accelerometer",{"hello":"world"});
 };
 MPISense.onAccelerometerData=function(data){
 	console.log("data"+data);
 };
 
-MPISense.initAcclerometerChart=function(){
+MPISense.accelerometerChart={};
 
-	$('#acclerometerGraph').highcharts('StockChart', {
+MPISense.addAccelerometerPoint=function(x,y,z){
+	var time = (new Date()).getTime();
+	
+	var seriesX=this.accelerometerChart.series[0];
+	var seriesY=this.accelerometerChart.series[1];
+	var seriesZ=this.accelerometerChart.series[2];
+	
+	seriesX.addPoint([time,x], false, false);
+	seriesY.addPoint([time,y], false, false);
+	seriesZ.addPoint([time,z], false, false);
+
+	this.accelerometerChart.redraw();
+};
+
+MPISense.initAcclerometerChart=function(){
+	$('#accelerometerGraph').highcharts('StockChart', {
         chart : {
             events : {
                 load : function () {
                     // set up the updating of the chart each second
-                    var series = this.series[0];
+                    /*var seriesX = this.series[0];
+                    var seriesY = this.series[1];
+                    var seriesZ = this.series[2];
                     setInterval(function () {
                         var x = (new Date()).getTime(), // current time
-                            y = Math.round(Math.random() * 100);
-                        series.addPoint([x, y], true, true);
-                    }, 1000);
+                            y = Math.round(Math.random() * 100),
+                            y1=Math.round(Math.random() * 100),
+                            y2=Math.round(Math.random() * 100);
+                        seriesX.addPoint([x, true);
+                        seriesY.addPoint([x, y1], true, true);
+                        seriesZ.addPoint([x, y2], true, true);
+                    }, 1000);*/
                 }
             }
         },
@@ -59,7 +87,7 @@ MPISense.initAcclerometerChart=function(){
         },
 
         title : {
-            text : 'Acclerometer Data'
+            text : 'Accelerometer Data'
         },
 
         exporting: {
@@ -67,20 +95,13 @@ MPISense.initAcclerometerChart=function(){
         },
 
         series : [{
-            name : 'Random data',
-            data : (function () {
-                // generate an array of random data
-                var data = [], time = (new Date()).getTime(), i;
-
-                for (i = -999; i <= 0; i += 1) {
-                    data.push([
-                        time + i * 1000,
-                        Math.round(Math.random() * 1000)
-                    ]);
-                }
-                return data;
-            }())
+            name : 'x-axis'
+            
+        },{
+            name : 'y-axis'
+        },{
+            name : 'z-axis'
         }]
     });
-
+	this.accelerometerChart=$('#accelerometerGraph').highcharts();
 };
