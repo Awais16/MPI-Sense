@@ -20,7 +20,6 @@ MPISense.initAcclerometerChart=function(){
         chart : {
             events : {
                 load : function () {
-
                     // set up the updating of the chart each second
                     var series = this.series[0];
                     setInterval(function () {
@@ -54,7 +53,7 @@ MPISense.initAcclerometerChart=function(){
         },
 
         exporting: {
-            enabled: false
+            enabled: true
         },
 
         series : [{
@@ -66,7 +65,7 @@ MPISense.initAcclerometerChart=function(){
                 for (i = -999; i <= 0; i += 1) {
                     data.push([
                         time + i * 1000,
-                        Math.round(Math.random() * 100)
+                        Math.round(Math.random() * 1000)
                     ]);
                 }
                 return data;
