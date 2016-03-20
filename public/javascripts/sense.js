@@ -27,14 +27,16 @@ MPISense.initSocket=function(){
 	socket.on('accelerometer',MPISense.onAccelerometerData);
 	socket.emit("accelerometer",{"hello":"world"});
 };
-MPISense.onAccelerometerData=function(data){
-	console.log("data"+data);
+MPISense.onAccelerometerData=function(accelerometerData){
+	//console.log("data"+data);
+	var dataArray=accelerometerData.split(",");
+	this.addAccelerometerPoint(parseInt(dataArray[0]),parseInt(dataArray[1]),parseInt(dataArray[2]));
 };
 
 MPISense.accelerometerChart={};
 
 MPISense.addAccelerometerPoint=function(x,y,z){
-	var time = (new Date()).getTime();
+	var time = (new Date()).getTime(); //its ok for small latency/delay;
 	
 	var seriesX=this.accelerometerChart.series[0];
 	var seriesY=this.accelerometerChart.series[1];
@@ -96,7 +98,6 @@ MPISense.initAcclerometerChart=function(){
 
         series : [{
             name : 'x-axis'
-            
         },{
             name : 'y-axis'
         },{
