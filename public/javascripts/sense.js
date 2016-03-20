@@ -16,7 +16,8 @@ MPISense.init = function() {
 };
 
 MPISense.initSocket=function(){
-	var socket = io('http://localhost:9000');
+	var that= this;
+	var socket = io('http://fotaxis.com:9000');
 	socket.on("connect",function(){
 		//$("#connectionStatus").text("connection established with server: awaiting data...");
 	});
@@ -24,8 +25,11 @@ MPISense.initSocket=function(){
 	socket.on("status",function(data){
 		$("#connectionStatus").text(data.status);
 	});
-	socket.on('accelerometer',MPISense.onAccelerometerData);
-	socket.emit("accelerometer",{"hello":"world"});
+	socket.on('accelerometer',function(data){
+		that.onAccelerometerData(data);
+	});
+	//socket.emit("accelerometer",{"hello":"world"});
+	socket.emit("register","web");
 };
 MPISense.onAccelerometerData=function(accelerometerData){
 	//console.log("data"+data);
@@ -34,7 +38,7 @@ MPISense.onAccelerometerData=function(accelerometerData){
 };
 
 MPISense.accelerometerChart={};
-
+MPISense.dataCount=0;
 MPISense.addAccelerometerPoint=function(x,y,z){
 	var time = (new Date()).getTime(); //its ok for small latency/delay;
 	
@@ -44,9 +48,13 @@ MPISense.addAccelerometerPoint=function(x,y,z){
 	
 	seriesX.addPoint([time,x], false, false);
 	seriesY.addPoint([time,y], false, false);
-	seriesZ.addPoint([time,z], false, false);
-
-	this.accelerometerChart.redraw();
+	seriesZ.addPoint([time,z], true, false);
+	MPISense.dataCount++;
+	if(MPISense.dataCount>32){ //32 values;
+		MPISense.dataCount=0;
+		this.accelerometerChart.redraw();
+	}
+	
 };
 
 MPISense.initAcclerometerChart=function(){
