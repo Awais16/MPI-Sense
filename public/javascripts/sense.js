@@ -48,7 +48,7 @@ MPISense.addAccelerometerPoint=function(x,y,z){
 	
 	seriesX.addPoint([time,x], false, false);
 	seriesY.addPoint([time,y], false, false);
-	seriesZ.addPoint([time,z], true, false);
+	seriesZ.addPoint([time,z], false, false);
 	MPISense.dataCount++;
 	if(MPISense.dataCount>32){ //32 values;
 		MPISense.dataCount=0;
