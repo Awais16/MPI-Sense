@@ -16,7 +16,9 @@ var MPISocket={
 		
 		socket.on('accelerometer',MPISocket.onAccelerationRecieved);
 		socket.on('bvp',MPISocket.onBVPRecieved);
+		socket.on('temperature',MPISocket.onTempRecieved);
 		socket.on('register',MPISocket.onRegister);
+		
 	},
 	onRegister:function(data){
 		console.log("onRegister");
@@ -32,6 +34,11 @@ var MPISocket={
 	onBVPRecieved:function(data){
 		if(MPISocket.socketWeb!=null){
 			MPISocket.socketWeb.emit('bvp',data);
+		}
+	},
+	onTempRecieved:function(data){
+		if(MPISocket.socketWeb!=null){
+			MPISocket.socketWeb.emit('temperature',data);
 		}
 	},
 	sendStatus:function(status){

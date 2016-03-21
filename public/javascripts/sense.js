@@ -13,6 +13,7 @@ MPISense.init = function() {
 
 	this.initAcclerometerChart();
 	this.initBVPChart();
+	this.initTempChart();
 	this.initSocket();
 };
 
@@ -33,9 +34,27 @@ MPISense.initSocket=function(){
 	socket.on('bvp',function(data){
 		that.onBVPrecieved(data);
 	});
+	
+	socket.on('temperature',function(data){
+		that.onTempRecieved(data);
+	});
 	//socket.emit("accelerometer",{"hello":"world"});
 	socket.emit("register","web");
 };
+MPISense.tempCount=0;
+MPISense.onTempRecieved=function(data){
+var x= parseInt(data);
+var time = (new Date()).getTime(); //its ok for small latency/delay;
+	
+	var seriesX=this.tempChart.series[0];
+	seriesX.addPoint([time,x], false, false);
+	MPISense.tempCount++;
+	if(MPISense.tempCount>4){ //64 values;
+		MPISense.tempCount=0;
+		this.tempChart.redraw();
+	}
+};
+
 MPISense.bvpCount=0;
 MPISense.onBVPrecieved=function(data){
 var x= parseInt(data);
@@ -48,7 +67,6 @@ var time = (new Date()).getTime(); //its ok for small latency/delay;
 		MPISense.bvpCount=0;
 		this.bvpChart.redraw();
 	}
-
 };
 MPISense.onAccelerometerData=function(accelerometerData){
 	//console.log("data"+data);
@@ -176,5 +194,51 @@ $('#bvpGraph').highcharts('StockChart', {
     });
 	this.bvpChart=$('#bvpGraph').highcharts();
 
+
+};
+
+
+MPISense.tempChart={};
+
+MPISense.initTempChart=function(){
+$('#tempGraph').highcharts('StockChart', {
+        chart : {
+            events : {
+                load : function () {
+                }
+            }
+        },
+
+        rangeSelector: {
+            buttons: [{
+                count: 1,
+                type: 'minute',
+                text: '1M'
+            }, {
+                count: 5,
+                type: 'minute',
+                text: '5M'
+            }, {
+                type: 'all',
+                text: 'All'
+            }],
+            inputEnabled: false,
+            selected: 0
+        },
+
+        title : {
+            text : 'EDA'
+        },
+
+        exporting: {
+            enabled: true
+        },
+		
+        series : [{
+            name : 'value'
+        }]
+		
+    });
+	this.tempChart=$('#tempGraph').highcharts();
 
 };
