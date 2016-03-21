@@ -12,6 +12,7 @@ MPISense.init = function() {
     });
 
 	this.initAcclerometerChart();
+	this.initBVPChart();
 	this.initSocket();
 };
 
@@ -28,8 +29,26 @@ MPISense.initSocket=function(){
 	socket.on('accelerometer',function(data){
 		that.onAccelerometerData(data);
 	});
+	
+	socket.on('bvp',function(data){
+		that.onBVPrecieved(data);
+	});
 	//socket.emit("accelerometer",{"hello":"world"});
 	socket.emit("register","web");
+};
+MPISense.bvpCount=0;
+MPISense.onBVPrecieved=function(data){
+var x= parseInt(data);
+var time = (new Date()).getTime(); //its ok for small latency/delay;
+	
+	var seriesX=this.bvpChart.series[0];
+	seriesX.addPoint([time,x], false, false);
+	MPISense.bvpCount++;
+	if(MPISense.bvpCount>64){ //64 values;
+		MPISense.bvpCount=0;
+		this.bvpChart.redraw();
+	}
+
 };
 MPISense.onAccelerometerData=function(accelerometerData){
 	//console.log("data"+data);
@@ -113,4 +132,49 @@ MPISense.initAcclerometerChart=function(){
         }]
     });
 	this.accelerometerChart=$('#accelerometerGraph').highcharts();
+};
+MPISense.bvpChart={};
+
+MPISense.initBVPChart=function(){
+$('#bvpGraph').highcharts('StockChart', {
+        chart : {
+            events : {
+                load : function () {
+                }
+            }
+        },
+
+        rangeSelector: {
+            buttons: [{
+                count: 1,
+                type: 'minute',
+                text: '1M'
+            }, {
+                count: 5,
+                type: 'minute',
+                text: '5M'
+            }, {
+                type: 'all',
+                text: 'All'
+            }],
+            inputEnabled: false,
+            selected: 0
+        },
+
+        title : {
+            text : 'BVP Data'
+        },
+
+        exporting: {
+            enabled: true
+        },
+		
+        series : [{
+            name : 'value'
+        }]
+		
+    });
+	this.bvpChart=$('#bvpGraph').highcharts();
+
+
 };

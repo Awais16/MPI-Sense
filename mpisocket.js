@@ -15,6 +15,7 @@ var MPISocket={
 		console.log('New connection from ' + socket.request.connection.remoteAddress);
 		
 		socket.on('accelerometer',MPISocket.onAccelerationRecieved);
+		socket.on('bvp',MPISocket.onBVPRecieved);
 		socket.on('register',MPISocket.onRegister);
 	},
 	onRegister:function(data){
@@ -26,6 +27,11 @@ var MPISocket={
 	onAccelerationRecieved:function(data){
 		if(MPISocket.socketWeb!=null){
 			MPISocket.socketWeb.emit('accelerometer',data);
+		}
+	},
+	onBVPRecieved:function(data){
+		if(MPISocket.socketWeb!=null){
+			MPISocket.socketWeb.emit('bvp',data);
 		}
 	},
 	sendStatus:function(status){
